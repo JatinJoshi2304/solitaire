@@ -48,16 +48,16 @@ const DropZone: FC<DropZoneProps> = ({ onDrop, Icon, color, cards }) => {
         cards.map((card, i) => (
           <div
             key={i}
-            className="w-[130px] absolute mt-39 h-fit bg-red-600 text-white border-2 border-white rounded-md shadow-md flex flex-col items-center justify-center"
+            className="w-[130px] absolute mt-39 h-fit bg-red-600 text-white  rounded-md shadow-md flex flex-col items-center justify-center"
             style={{
-              top: `${i * 5}%`,
+              top: `${i * 2.6}%`,
               zIndex: i,
             }}
           >
             <img
               src={card.img}
               alt={`${card.rank} of ${card.suit}`}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover border-1 border-gray-400 rounded-md shadow-md"
             />
           </div>
         ))

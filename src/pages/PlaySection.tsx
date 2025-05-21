@@ -16,7 +16,11 @@ const SuitDropZone: FC<{
   Icon: FC;
   color?: string;
 }> = ({ cards, onDrop, Icon, color }) => (
-  <div className="h-full border border-gray-600 rounded-lg shadow-inner shadow-black/30 flex flex-col items-center justify-center">
+  <div
+    className={`h-full border border-gray-600 rounded-lg shadow-inner shadow-black/30 flex flex-col items-center justify-center ${
+      cards.length >= 13 ? "pointer-events-none opacity-50" : ""
+    }`}
+  >
     <DropZone onDrop={onDrop} Icon={Icon} color={color} cards={cards} />
   </div>
 );
@@ -27,7 +31,16 @@ const PlaySection: FC = () => {
   const [diamondCards, setDiamondCards] = useState<Card[]>([]);
   const [clubCards, setClubCards] = useState<Card[]>([]);
   const [spadeCards, setSpadeCards] = useState<Card[]>([]);
-
+  const [randomCard, setRandomCard] = useState<Card | null>(null);
+  const [moves, setMoves] = useState(0);
+  const [time, setTime] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const [isGameOver, setIsGameOver] = useState(false);
+  const [isGameWon, setIsGameWon] = useState(false);
+  const [isGameStarted, setIsGameStarted] = useState(false);
+  const [isGameRestarted, setIsGameRestarted] = useState(false);
+  const [createDeck, setCreateDeck] = useState(false);
+  const [highestScore, setHighestScore] = useState(0);
   const suits = ["Hearts", "Diamonds", "Clubs", "Spades"];
   const ranks = [
     { rank: "A", value: 1 },
@@ -61,7 +74,73 @@ const PlaySection: FC = () => {
     }
 
     setDeck(newDeck);
-  }, []);
+  }, [createDeck]);
+
+  useEffect(() => {
+    if (isGameStarted && !isPaused && !isGameOver) {
+      const interval = setInterval(() => {
+        setTime((prev) => prev + 1);
+      }, 1000);
+
+      return () => clearInterval(interval);
+    }
+  }, [isGameStarted, isPaused, isGameOver]);
+
+  useEffect(() => {
+    if (deck.length === 0 && isGameStarted && !isGameOver) {
+      setIsGameOver(true);
+      setHighestScore((prev) => (prev > time ? time : prev));
+    }
+  }, [deck, isGameStarted, isGameOver]);
+
+  useEffect(() => {
+    if (
+      heartCards.length === 13 &&
+      diamondCards.length === 13 &&
+      clubCards.length === 13 &&
+      spadeCards.length === 13 &&
+      isGameStarted &&
+      !isGameWon
+    ) {
+      setIsGameWon(true);
+      setIsGameOver(true);
+    }
+  }, [
+    heartCards,
+    diamondCards,
+    clubCards,
+    spadeCards,
+    isGameStarted,
+    isGameWon,
+  ]);
+
+  useEffect(() => {
+    if (deck.length > 0) {
+      const random = deck[Math.floor(Math.random() * deck.length)];
+      setRandomCard(random);
+    } else {
+      setRandomCard(null);
+    }
+  }, [deck]);
+
+  useEffect(() => {
+    if (isGameRestarted) {
+      setDeck([]);
+      setCreateDeck(false);
+      setHeartCards([]);
+      setDiamondCards([]);
+      setClubCards([]);
+      setSpadeCards([]);
+      setRandomCard(null);
+      setMoves(0);
+      setTime(0);
+      setIsPaused(false);
+      setIsGameOver(false);
+      setIsGameWon(false);
+      setIsGameStarted(false);
+      setIsGameRestarted(false);
+    }
+  }, [isGameRestarted]);
 
   const backCard: Card = {
     suit: "Back",
@@ -71,49 +150,75 @@ const PlaySection: FC = () => {
     img: "/playing-cards/back.svg",
   };
 
-  const randomCard = deck[Math.floor(Math.random() * deck.length)];
-
   const handleDrop = (suit: string) => (item: { card: Card }) => {
-    debugger;
     const { card } = item;
-    console.log("Dropped card:", card);
+
     switch (suit) {
       case "hearts":
+        if (card.suit !== "Hearts") return;
         setHeartCards((prev) => [...prev, card]);
+        setMoves((prev) => prev + 1);
         break;
       case "diamonds":
+        if (card.suit !== "Diamonds") return;
         setDiamondCards((prev) => [...prev, card]);
+        setMoves((prev) => prev + 1);
         break;
       case "clubs":
+        if (card.suit !== "Clubs") return;
         setClubCards((prev) => [...prev, card]);
+        setMoves((prev) => prev + 1);
         break;
       case "spades":
+        if (card.suit !== "Spades") return;
         setSpadeCards((prev) => [...prev, card]);
+        setMoves((prev) => prev + 1);
         break;
     }
 
-    // remove the card from the deck
-    setDeck((prev) => prev.filter((c) => c.code !== card.code));
-    console.log(deck);
+    setDeck((prevDeck) => prevDeck.filter((c) => c.code !== card.code));
   };
 
   return (
     <div className="w-full h-full flex flex-col items-center justify-center">
       <div className="px-[10%] flex gap-2 my-2">
-        {["New Game", "Restart Game", "Pause Game", "About", "Options"].map(
-          (text, idx) => (
-            <button key={idx} className="text-[#ca0639] text-lg font-bold">
-              {text}
-              {idx < 4 && " | "}
-            </button>
-          )
-        )}
+        <button
+          className="text-[#ca0639] text-lg font-bold hover:text-black cursor-pointer "
+          onClick={() => {
+            setIsGameRestarted(true);
+            setCreateDeck(!createDeck);
+          }}
+        >
+          New Game
+        </button>
+        <span className="text-[#ca0639] text-lg font-bold">{" | "}</span>
+        <button
+          className="text-[#ca0639] text-lg font-bold hover:text-black cursor-pointer"
+          onClick={() => setIsPaused(!isPaused)}
+        >
+          {isPaused ? "Resume Game" : "Pause Game"}
+        </button>
       </div>
 
-      <div className="bg-[#00a000] w-full h-screen border-2 border-gray-500 rounded-lg flex flex-col items-center pb-5">
+      <div
+        className={`bg-green-700 w-full h-screen border-2 border-gray-500 rounded-lg flex flex-col items-center pb-5 ${
+          !isGameStarted || isPaused ? "relative" : ""
+        }`}
+      >
         <div className="flex w-full justify-between items-center text-white p-2">
-          <span>hh:mm:ss</span>
-          <span>0 Moves</span>
+          <span className="font-mono">
+            Highest :{String(Math.floor(highestScore / 3600)).padStart(2, "0")}:
+            {String(Math.floor((highestScore % 3600) / 60)).padStart(2, "0")}:
+            {String(highestScore % 60).padStart(2, "0")}
+          </span>
+          <span className="font-mono">
+            Time:
+            {String(Math.floor(time / 3600)).padStart(2, "0")}:
+            {String(Math.floor((time % 3600) / 60)).padStart(2, "0")}:
+            {String(time % 60).padStart(2, "0")}
+          </span>
+
+          <span className="font-mono">Moves : {moves} </span>
         </div>
 
         <div className="flex flex-row-reverse justify-center w-full h-full">
@@ -147,12 +252,14 @@ const PlaySection: FC = () => {
               {deck.map((card, i) => (
                 <DraggableCard key={i} card={card} index={i} vertical={false} />
               ))}
-              <DraggableCard
-                key="back-card"
-                card={backCard}
-                index={deck.length}
-                vertical={false}
-              />
+              {deck.length > 1 && (
+                <DraggableCard
+                  key="back-card"
+                  card={backCard}
+                  index={deck.length}
+                  vertical={false}
+                />
+              )}
               {randomCard && (
                 <DraggableCard
                   key="front-card"
@@ -161,9 +268,36 @@ const PlaySection: FC = () => {
                   vertical={false}
                 />
               )}
+              {isGameOver && (
+                <div className="px-5 py-2 mt-5 text-red-700 text-2xl font-semibold ">
+                  Game Over
+                </div>
+              )}
             </div>
           </div>
         </div>
+
+        {!isGameStarted && (
+          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-100">
+            <button
+              onClick={() => setIsGameStarted(true)}
+              className="px-6 py-3 bg-white text-green-700 font-semibold rounded-lg shadow-md hover:bg-green-100 transition-all"
+            >
+              Start Game
+            </button>
+          </div>
+        )}
+
+        {isPaused && (
+          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-100">
+            <button
+              onClick={() => setIsPaused(false)}
+              className="px-6 py-3 bg-white text-green-700 font-semibold rounded-lg shadow-md hover:bg-green-100 transition-all"
+            >
+              Resume Game
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

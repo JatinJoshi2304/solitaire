@@ -12,13 +12,13 @@ interface Props {
 const DraggableCard: FC<Props> = ({ card, index = 0, vertical }) => {
   const ref = useRef<HTMLDivElement>(null);
 
-  const [{ isDragging }, drag] = useDrag(() => ({
+  const [{ isDragging }, drag] = useDrag({
     type: "CARD",
-    item: { card, index } as DragItem,
+    item: () => ({ card, index }),
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
-  }));
+  });
 
   drag(ref);
 
@@ -29,21 +29,19 @@ const DraggableCard: FC<Props> = ({ card, index = 0, vertical }) => {
   return (
     <div
       ref={ref}
-      className="w-[130px] h-full bg-white border-2 border-gray-300 rounded-md shadow-md flex items-center justify-center overflow-hidden"
+      className={`w-[130px] h-full relative bg-white border-1 border-gray-400 rounded-md shadow-xs flex items-center justify-center overflow-hidden mt:[${index}px]`}
       style={{
         opacity: isDragging ? 0 : 1,
         cursor: "move",
         ...style,
+
+        bottom: `${index * 0.3}px`,
       }}
     >
       <img
         src={card.img}
         alt={`${card.rank} of ${card.suit}`}
         className="w-full h-full object-cover"
-        // style={{
-        //   transform: vertical ? "rotate(90deg)" : "rotate(0deg)",
-        //   transition: "transform 0.2s ease",
-        // }}
       />
     </div>
   );
