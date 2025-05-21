@@ -1,7 +1,7 @@
 import type { FC } from "react";
 import { useRef } from "react";
 import { useDrag } from "react-dnd";
-import type { Card, DragItem } from "../types/card";
+import type { Card } from "../types/card";
 
 interface Props {
   card: Card;
