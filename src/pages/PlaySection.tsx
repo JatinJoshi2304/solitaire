@@ -40,7 +40,7 @@ const PlaySection: FC = () => {
   const [isGameStarted, setIsGameStarted] = useState(false);
   const [isGameRestarted, setIsGameRestarted] = useState(false);
   const [createDeck, setCreateDeck] = useState(false);
-  const [highestScore, setHighestScore] = useState(0);
+  const [highestScore, setHighestScore] = useState(1000000);
   const suits = ["Hearts", "Diamonds", "Clubs", "Spades"];
   const ranks = [
     { rank: "A", value: 1 },
@@ -89,7 +89,14 @@ const PlaySection: FC = () => {
   useEffect(() => {
     if (deck.length === 0 && isGameStarted && !isGameOver) {
       setIsGameOver(true);
-      setHighestScore((prev) => (prev > time ? time : prev));
+      debugger;
+      console.log();
+      const newScore = time < highestScore ? time : highestScore;
+      console.log("Time", time);
+      console.log("Highest Score", highestScore);
+      console.log("New Score", newScore);
+      setHighestScore(newScore);
+      console.log("Highest Score", highestScore);
     }
   }, [deck, isGameStarted, isGameOver]);
 
@@ -207,9 +214,16 @@ const PlaySection: FC = () => {
       >
         <div className="flex w-full justify-between items-center text-white p-2">
           <span className="font-mono">
-            Highest :{String(Math.floor(highestScore / 3600)).padStart(2, "0")}:
-            {String(Math.floor((highestScore % 3600) / 60)).padStart(2, "0")}:
-            {String(highestScore % 60).padStart(2, "0")}
+            Highest :{" "}
+            {highestScore === 1000000
+              ? "--:--:--"
+              : `${String(Math.floor(highestScore / 3600)).padStart(
+                  2,
+                  "0"
+                )}:${String(Math.floor((highestScore % 3600) / 60)).padStart(
+                  2,
+                  "0"
+                )}:${String(highestScore % 60).padStart(2, "0")}`}
           </span>
           <span className="font-mono">
             Time:
@@ -247,7 +261,7 @@ const PlaySection: FC = () => {
             />
           </div>
 
-          <div className="flex py-2 w-[20%] h-[45%] m-auto">
+          <div className="flex py-2 w-[25%] h-[45%] m-auto">
             <div className="flex justify-center h-full">
               {deck.map((card, i) => (
                 <DraggableCard key={i} card={card} index={i} vertical={false} />
@@ -269,8 +283,13 @@ const PlaySection: FC = () => {
                 />
               )}
               {isGameOver && (
-                <div className="px-5 py-2 mt-5 text-red-700 text-2xl font-semibold ">
-                  Game Over
+                <div className="mt-5">
+                  <div className="px-5 text-red-700 text-2xl font-semibold ">
+                    Game Over
+                  </div>
+                  <div className="px-5 text-red-700 text-2xl font-semibold ">
+                    Start New Game
+                  </div>
                 </div>
               )}
             </div>
