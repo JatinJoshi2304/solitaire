@@ -17,7 +17,7 @@ const SuitDropZone: FC<{
   color?: string;
 }> = ({ cards, onDrop, Icon, color }) => (
   <div
-    className={`h-full border border-gray-600 rounded-lg shadow-inner shadow-black/30 flex flex-col items-center justify-center ${
+    className={`h-full w-fit  border border-gray-600 rounded-lg shadow-inner shadow-black/30 flex flex-col items-center justify-center ${
       cards.length >= 13 ? "pointer-events-none opacity-50" : ""
     }`}
   >
@@ -208,7 +208,7 @@ const PlaySection: FC = () => {
       </div>
 
       <div
-        className={`bg-green-700 w-full h-screen border-2 border-gray-500 rounded-lg flex flex-col items-center pb-5 ${
+        className={`bg-green-700 w-full h-fit [@media(min-width:1100px)]:h-[80vh] border-2 border-gray-500 rounded-lg flex flex-col items-center pb-5 ${
           !isGameStarted || isPaused ? "relative" : ""
         }`}
       >
@@ -235,8 +235,16 @@ const PlaySection: FC = () => {
           <span className="font-mono">Moves : {moves} </span>
         </div>
 
-        <div className="flex flex-row-reverse justify-center w-full h-full">
-          <div className="flex justify-between items-center mx-5 py-2 w-[70%] h-[45%]">
+        <div className="flex flex-row-reverse justify-center w-full">
+          <div
+            className="
+              grid grid-cols-2 gap-4
+              justify-between items-center mx-5 py-2 w-[70%]
+              [@media(min-width:1100px)]:flex
+              [@media(min-width:1100px)]:grid-cols-1
+              [@media(min-width:1100px)]:gap-2
+            "
+          >
             <SuitDropZone
               cards={heartCards}
               onDrop={handleDrop("hearts")}
@@ -261,7 +269,7 @@ const PlaySection: FC = () => {
             />
           </div>
 
-          <div className="flex py-2 w-[25%] h-[45%] m-auto">
+          <div className="flex py-2 w-[20%] h-[45%] m-auto">
             <div className="flex justify-center h-full">
               {deck.map((card, i) => (
                 <DraggableCard key={i} card={card} index={i} vertical={false} />
@@ -283,9 +291,9 @@ const PlaySection: FC = () => {
                 />
               )}
               {isGameOver && (
-                <div className="mt-5">
+                <div className="mt-15">
                   <div className="px-5 text-red-700 text-2xl font-semibold ">
-                    Game Over
+                    Game Over!!
                   </div>
                   <div className="px-5 text-red-700 text-2xl font-semibold ">
                     Start New Game

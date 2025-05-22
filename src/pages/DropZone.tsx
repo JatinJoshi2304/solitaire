@@ -34,13 +34,11 @@ const DropZone: FC<DropZoneProps> = ({ onDrop, Icon, color, cards }) => {
   return (
     <div
       ref={ref}
-      className={`h-full w-[130px] border rounded-lg flex flex-col items-center justify-center transition-all duration-300 ease-in-out
+      className={`w-[130px] h-[180px] border border-green-900 rounded-lg flex flex-col items-center justify-center transition-all duration-300 ease-in-out 
     ${
       isActive
         ? "bg-gradient-to-br from-white to-gray-100 shadow-[0_0_15px_5px_rgba(0,0,0,0.3)] border-2 border-white "
-        : canDrop
-        ? "bg-white border-2 border-green-600 opacity-70"
-        : "bg-gray-200 border border-gray-400 shadow-inner shadow-black/20"
+        : ""
     }
   `}
     >
@@ -48,7 +46,7 @@ const DropZone: FC<DropZoneProps> = ({ onDrop, Icon, color, cards }) => {
         cards.map((card, i) => (
           <div
             key={i}
-            className="w-[130px] absolute mt-39 h-fit bg-red-600 text-white  rounded-md shadow-md flex flex-col items-center justify-center"
+            className="w-[130px] h-[180px]  absolute mt-38  bg-red-600 text-white  rounded-md shadow-md flex flex-col items-center justify-center"
             style={{
               top: `${i * 2.6}%`,
               zIndex: i,
