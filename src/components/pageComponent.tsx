@@ -67,11 +67,11 @@ const Page = ({
         }
       }}
     >
-      <div className="absolute w-full h-full backface-hidden bg-white border border-gray-300 rounded-md flex items-center justify-center text-2xl font-semibold">
-        {page.front}
+      <div className="absolute w-full h-full backface-hidden bg-white border border-gray-300 rounded-md flex items-center justify-center text-2xl font-semibold  ">
+        <span className="mx-12">{page.front}</span>
       </div>
       <div className="absolute w-full h-full backface-hidden bg-gray-100 border border-gray-300 rounded-md flex items-center justify-center text-2xl font-semibold transform rotate-y-180">
-        {page.back}
+        <span className="mx-12">{page.back}</span>
       </div>
     </div>
   );
@@ -79,10 +79,21 @@ const Page = ({
 
 const Book = () => {
   const pages: PageType[] = [
-    { id: 1, front: "Page 1 Front", back: "Page 1 Back" },
-    { id: 2, front: "Page 2 Front", back: "Page 2 Back" },
-    { id: 3, front: "Page 3 Front", back: "Page 3 Back" },
-    { id: 4, front: "Page 4 Front", back: "Page 4 Back" },
+    {
+      id: 1,
+      front: "Drag cards and drop them into the correct zones.",
+      back: "Flip book pages to reveal more content or hidden cards.",
+    },
+    {
+      id: 2,
+      front: "Use strategy or memory to match or sort cards.",
+      back: "Complete all tasks to win the game.",
+    },
+    {
+      id: 3,
+      front: "Have fun and explore each page carefully!",
+      back: "You can only move one card at a time—plan your moves wisely!",
+    },
   ];
 
   const [flippedPages, setFlippedPages] = useState<number[]>([]);

@@ -20,7 +20,7 @@ const RuleBookComponent = ({ closeModal }: any) => {
             </span>
             <Book />
             <span className="absolute z-0 top-44 left-20 text-2xl font-semibold">
-              Role Book
+              How to Play
             </span>
           </div>
         </div>

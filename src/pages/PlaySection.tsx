@@ -22,7 +22,7 @@ const PlaySection = () => {
   const [time, setTime] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [isGameOver, setIsGameOver] = useState(false);
-  const [isGameWon, setIsGameWon] = useState(false);
+  // const [isGameWon, setIsGameWon] = useState(false);
   const [isGameStarted, setIsGameStarted] = useState(false);
   const [isGameRestarted, setIsGameRestarted] = useState(false);
   const [createDeck, setCreateDeck] = useState(false);
@@ -44,7 +44,7 @@ const PlaySection = () => {
     { rank: "Q", value: 12 },
     { rank: "K", value: 13 },
   ];
-
+  //Create deck
   useEffect(() => {
     const newDeck: Card[] = [];
 
@@ -63,6 +63,7 @@ const PlaySection = () => {
     setDeck(newDeck);
   }, [createDeck]);
 
+  //Timer
   useEffect(() => {
     if (isGameStarted && !isPaused && !isGameOver) {
       const interval = setInterval(() => {
@@ -73,6 +74,7 @@ const PlaySection = () => {
     }
   }, [isGameStarted, isPaused, isGameOver]);
 
+  //Highest Score
   useEffect(() => {
     if (deck.length === 0 && isGameStarted && !isGameOver) {
       setIsGameOver(true);
@@ -91,16 +93,17 @@ const PlaySection = () => {
     setShowRuleBook(close);
   };
 
+  //Check if all cards are in their respective suit if yes then game over
   useEffect(() => {
     if (
       heartCards.length === 13 &&
       diamondCards.length === 13 &&
       clubCards.length === 13 &&
       spadeCards.length === 13 &&
-      isGameStarted &&
-      !isGameWon
+      isGameStarted
+      // &&      !isGameWon
     ) {
-      setIsGameWon(true);
+      // setIsGameWon(true);
       setIsGameOver(true);
     }
   }, [
@@ -109,9 +112,10 @@ const PlaySection = () => {
     clubCards,
     spadeCards,
     isGameStarted,
-    isGameWon,
+    // isGameWon,
   ]);
 
+  //Random Card
   useEffect(() => {
     if (deck.length > 0) {
       const random = deck[Math.floor(Math.random() * deck.length)];
@@ -121,6 +125,7 @@ const PlaySection = () => {
     }
   }, [deck]);
 
+  //Restart Game
   useEffect(() => {
     if (isGameRestarted) {
       setDeck([]);
@@ -134,12 +139,13 @@ const PlaySection = () => {
       setTime(0);
       setIsPaused(false);
       setIsGameOver(false);
-      setIsGameWon(false);
+      // setIsGameWon(false);
       setIsGameStarted(false);
       setIsGameRestarted(false);
     }
   }, [isGameRestarted]);
 
+  // back card
   const backCard: Card = {
     suit: "Back",
     rank: "B",
@@ -148,6 +154,7 @@ const PlaySection = () => {
     img: "/playing-cards/back.svg",
   };
 
+  // Dropzone handlers
   const handleDrop = (suit: string) => (item: { card: Card }) => {
     const { card } = item;
 
@@ -215,24 +222,26 @@ const PlaySection = () => {
         }`}
       >
         <div className="flex w-full justify-between items-center text-white p-2">
-          <span className="font-mono">
-            Highest :{" "}
-            {highestScore === 1000000
-              ? "--:--:--"
-              : `${String(Math.floor(highestScore / 3600)).padStart(
-                  2,
-                  "0"
-                )}:${String(Math.floor((highestScore % 3600) / 60)).padStart(
-                  2,
-                  "0"
-                )}:${String(highestScore % 60).padStart(2, "0")}`}
-          </span>
-          <span className="font-mono">
-            Time:
-            {String(Math.floor(time / 3600)).padStart(2, "0")}:
-            {String(Math.floor((time % 3600) / 60)).padStart(2, "0")}:
-            {String(time % 60).padStart(2, "0")}
-          </span>
+          <div className="flex flex-col">
+            <span className="font-mono">
+              Highest Score:{" "}
+              {highestScore === 1000000
+                ? "--:--:--"
+                : `${String(Math.floor(highestScore / 3600)).padStart(
+                    2,
+                    "0"
+                  )}:${String(Math.floor((highestScore % 3600) / 60)).padStart(
+                    2,
+                    "0"
+                  )}:${String(highestScore % 60).padStart(2, "0")}`}
+            </span>
+            <span className="font-mono">
+              Time:
+              {String(Math.floor(time / 3600)).padStart(2, "0")}:
+              {String(Math.floor((time % 3600) / 60)).padStart(2, "0")}:
+              {String(time % 60).padStart(2, "0")}
+            </span>
+          </div>
 
           <span className="font-mono">Moves : {moves} </span>
         </div>
