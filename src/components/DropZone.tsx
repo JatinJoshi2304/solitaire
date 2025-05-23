@@ -45,7 +45,7 @@ const DropZone = ({ onDrop, Icon, color, cards }: DropZoneProps) => {
         cards.map((card, i) => (
           <div
             key={i}
-            className="w-[130px] h-[180px]  absolute mt-38  bg-red-600 text-white  rounded-md shadow-md flex flex-col items-center justify-center"
+            className="w-[130px] h-[180px]  absolute mt-45  bg-red-600 text-white  rounded-md shadow-md flex flex-col items-center justify-center"
             style={{
               top: `${i * 2.6}%`,
               zIndex: i,
