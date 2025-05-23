@@ -1,4 +1,3 @@
-import type { FC } from "react";
 import { useDrop } from "react-dnd";
 import { useRef, useEffect } from "react";
 import type { Card, DragItem } from "../types/card";
@@ -9,7 +8,7 @@ interface DropZoneProps {
   color?: string;
   cards: Card[];
 }
-const DropZone: FC<DropZoneProps> = ({ onDrop, Icon, color, cards }) => {
+const DropZone = ({ onDrop, Icon, color, cards }: DropZoneProps) => {
   const ref = useRef<HTMLDivElement>(null);
 
   const [{ isOver, canDrop }, drop] = useDrop(() => ({

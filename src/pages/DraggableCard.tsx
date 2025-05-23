@@ -1,4 +1,3 @@
-import type { FC } from "react";
 import { useRef } from "react";
 import { useDrag } from "react-dnd";
 import type { Card } from "../types/card";
@@ -9,7 +8,7 @@ interface Props {
   vertical: boolean;
 }
 
-const DraggableCard: FC<Props> = ({ card, index = 0, vertical }) => {
+const DraggableCard = ({ card, index = 0, vertical }: Props) => {
   const ref = useRef<HTMLDivElement>(null);
 
   const [{ isDragging }, drag] = useDrag({

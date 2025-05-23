@@ -9,13 +9,19 @@ import {
 import DraggableCard from "./DraggableCard";
 import DropZone from "./DropZone";
 import type { Card } from "../types/card";
+import RuleBookComponent from "../components/RuleBookComponent";
 
-const SuitDropZone: FC<{
+const SuitDropZone = ({
+  cards,
+  onDrop,
+  Icon,
+  color,
+}: {
   cards: Card[];
   onDrop: (item: { card: Card }) => void;
   Icon: FC;
   color?: string;
-}> = ({ cards, onDrop, Icon, color }) => (
+}) => (
   <div
     className={`h-full w-fit  border border-gray-600 rounded-lg shadow-inner shadow-black/30 flex flex-col items-center justify-center ${
       cards.length >= 13 ? "pointer-events-none opacity-50" : ""
@@ -25,7 +31,7 @@ const SuitDropZone: FC<{
   </div>
 );
 
-const PlaySection: FC = () => {
+const PlaySection = () => {
   const [deck, setDeck] = useState<Card[]>([]);
   const [heartCards, setHeartCards] = useState<Card[]>([]);
   const [diamondCards, setDiamondCards] = useState<Card[]>([]);
@@ -41,6 +47,7 @@ const PlaySection: FC = () => {
   const [isGameRestarted, setIsGameRestarted] = useState(false);
   const [createDeck, setCreateDeck] = useState(false);
   const [highestScore, setHighestScore] = useState(1000000);
+  const [showRuleBook, setShowRuleBook] = useState(false);
   const suits = ["Hearts", "Diamonds", "Clubs", "Spades"];
   const ranks = [
     { rank: "A", value: 1 },
@@ -99,6 +106,10 @@ const PlaySection: FC = () => {
       console.log("Highest Score", highestScore);
     }
   }, [deck, isGameStarted, isGameOver]);
+
+  const handleClose = (close: boolean) => {
+    setShowRuleBook(close);
+  };
 
   useEffect(() => {
     if (
@@ -199,11 +210,22 @@ const PlaySection: FC = () => {
           New Game
         </button>
         <span className="text-[#ca0639] text-lg font-bold">{" | "}</span>
+        {isGameStarted && (
+          <>
+            <button
+              className="text-[#ca0639] text-lg font-bold hover:text-black cursor-pointer"
+              onClick={() => setIsPaused(!isPaused)}
+            >
+              {isPaused ? "Resume Game" : "Pause Game"}
+            </button>
+            <span className="text-[#ca0639] text-lg font-bold">{" | "}</span>
+          </>
+        )}
         <button
           className="text-[#ca0639] text-lg font-bold hover:text-black cursor-pointer"
-          onClick={() => setIsPaused(!isPaused)}
+          onClick={() => setShowRuleBook(!showRuleBook)}
         >
-          {isPaused ? "Resume Game" : "Pause Game"}
+          Rules
         </button>
       </div>
 
@@ -282,6 +304,7 @@ const PlaySection: FC = () => {
                   vertical={false}
                 />
               )}
+
               {randomCard && (
                 <DraggableCard
                   key="front-card"
@@ -290,6 +313,14 @@ const PlaySection: FC = () => {
                   vertical={false}
                 />
               )}
+              {/* {isGameStarted && (
+                <DraggableCard
+                  key="back-card"
+                  card={backCard}
+                  index={deck.length + 1}
+                  vertical={false}
+                />
+              )} */}
               {isGameOver && (
                 <div className="mt-15">
                   <div className="px-5 text-red-700 text-2xl font-semibold ">
@@ -326,6 +357,7 @@ const PlaySection: FC = () => {
           </div>
         )}
       </div>
+      {showRuleBook && <RuleBookComponent closeModal={handleClose} />}
     </div>
   );
 };

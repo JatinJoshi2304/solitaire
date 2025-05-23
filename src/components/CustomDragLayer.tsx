@@ -1,5 +1,4 @@
 import { useDragLayer } from "react-dnd";
-import type { FC } from "react";
 import type { DragItem } from "../types/card";
 
 const layerStyles: React.CSSProperties = {
@@ -20,7 +19,7 @@ const getItemStyles = (initialOffset: any, currentOffset: any) => {
   };
 };
 
-const CustomDragLayer: FC = () => {
+const CustomDragLayer = () => {
   const { item, isDragging, initialOffset, currentOffset } = useDragLayer(
     (monitor) => ({
       item: monitor.getItem() as DragItem,
