@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import { useState, useRef } from "react";
 import { useDrag } from "react-dnd";
 import type { DragSourceMonitor } from "react-dnd";
 
