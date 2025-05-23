@@ -6,30 +6,10 @@ import {
   RiPokerDiamondsFill,
   RiPokerClubsFill,
 } from "react-icons/ri";
-import DraggableCard from "./DraggableCard";
-import DropZone from "./DropZone";
+import DraggableCard from "../components/DraggableCard";
+import SuitDropZone from "../components/SuitDropZone";
 import type { Card } from "../types/card";
 import RuleBookComponent from "../components/RuleBookComponent";
-
-const SuitDropZone = ({
-  cards,
-  onDrop,
-  Icon,
-  color,
-}: {
-  cards: Card[];
-  onDrop: (item: { card: Card }) => void;
-  Icon: FC;
-  color?: string;
-}) => (
-  <div
-    className={`h-full w-fit  border border-gray-600 rounded-lg shadow-inner shadow-black/30 flex flex-col items-center justify-center ${
-      cards.length >= 13 ? "pointer-events-none opacity-50" : ""
-    }`}
-  >
-    <DropZone onDrop={onDrop} Icon={Icon} color={color} cards={cards} />
-  </div>
-);
 
 const PlaySection = () => {
   const [deck, setDeck] = useState<Card[]>([]);
