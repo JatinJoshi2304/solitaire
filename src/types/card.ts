@@ -11,3 +11,23 @@ export interface DragItem {
   index: number;
   type: string;
 }
+
+export interface Room {
+  id: string;
+  servername: string;
+  players?: string[];
+  owner?: string;
+  status?: "waiting" | "playing" | "finished";
+  isPasswordProtected: boolean;
+  password?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+export interface Player {
+  id: string;
+  name: string;
+  avatar?: string;
+  score: number;
+  roomId: string;
+  isReady: boolean;
+}

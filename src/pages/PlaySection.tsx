@@ -10,6 +10,9 @@ import DraggableCard from "../components/DraggableCard";
 import SuitDropZone from "../components/SuitDropZone";
 import type { Card } from "../types/card";
 import RuleBookComponent from "../components/RuleBookComponent";
+import { Link } from "react-router-dom";
+import ChooseGameModal from "../components/ChooseGameModal";
+import { IoMdArrowRoundBack } from "react-icons/io";
 
 const PlaySection = () => {
   const [deck, setDeck] = useState<Card[]>([]);
@@ -22,12 +25,14 @@ const PlaySection = () => {
   const [time, setTime] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [isGameOver, setIsGameOver] = useState(false);
-  // const [isGameWon, setIsGameWon] = useState(false);
   const [isGameStarted, setIsGameStarted] = useState(false);
   const [isGameRestarted, setIsGameRestarted] = useState(false);
   const [createDeck, setCreateDeck] = useState(false);
   const [highestScore, setHighestScore] = useState(1000000);
   const [showRuleBook, setShowRuleBook] = useState(false);
+  const [showGames, setShowGames] = useState(false);
+  const [chooseGame, setChooseGame] = useState(false);
+
   const suits = ["Hearts", "Diamonds", "Clubs", "Spades"];
   const ranks = [
     { rank: "A", value: 1 },
@@ -89,8 +94,12 @@ const PlaySection = () => {
     }
   }, [deck, isGameStarted, isGameOver]);
 
-  const handleClose = (close: boolean) => {
+  const handleCloseRuleBook = (close: boolean) => {
     setShowRuleBook(close);
+  };
+
+  const handleCloseChooseModal = (close: boolean) => {
+    setChooseGame(close);
   };
 
   //Check if all cards are in their respective suit if yes then game over
@@ -187,6 +196,13 @@ const PlaySection = () => {
   return (
     <div className="w-full h-full flex flex-col items-center justify-center">
       <div className="px-[10%] flex gap-2 my-2">
+        {/* <button
+          className="text-[#ca0639] text-lg font-bold hover:text-black cursor-pointer"
+          onClick={() => setChooseGame(!chooseGame)}
+        >
+          Start game
+        </button> */}
+        {/* <span className="text-[#ca0639] text-lg font-bold">{" | "}</span> */}
         <button
           className="text-[#ca0639] text-lg font-bold hover:text-black cursor-pointer "
           onClick={() => {
@@ -282,43 +298,53 @@ const PlaySection = () => {
 
           <div className="flex py-2 w-[20%] h-[45%] m-auto">
             <div className="flex justify-center h-full">
-              {deck.map((card, i) => (
-                <DraggableCard key={i} card={card} index={i} vertical={false} />
-              ))}
-              {deck.length > 1 && (
-                <DraggableCard
-                  key="back-card"
-                  card={backCard}
-                  index={deck.length}
-                  vertical={false}
-                />
-              )}
-
-              {randomCard && (
-                <DraggableCard
-                  key="front-card"
-                  card={randomCard}
-                  index={deck.length + 1}
-                  vertical={false}
-                />
-              )}
-              {/* {isGameStarted && (
-                <DraggableCard
-                  key="back-card"
-                  card={backCard}
-                  index={deck.length + 1}
-                  vertical={false}
-                />
-              )} */}
-              {isGameOver && (
-                <div className="mt-15">
-                  <div className="px-5 text-red-700 text-2xl font-semibold ">
-                    Game Over!!
-                  </div>
-                  <div className="px-5 text-red-700 text-2xl font-semibold ">
-                    Start New Game
-                  </div>
+              {!isGameStarted ? (
+                <div className="w-[130px] h-[180px]  absolute text-white  rounded-md shadow-md flex flex-col items-center justify-center ml-35">
+                  <img
+                    src={backCard.img}
+                    alt={`${backCard.rank} of ${backCard.suit}`}
+                    className="w-full h-full object-cover border-1 border-gray-400 rounded-md shadow-md"
+                  />
                 </div>
+              ) : (
+                <>
+                  {deck.map((card, i) => (
+                    <DraggableCard
+                      key={i}
+                      card={card}
+                      index={i}
+                      vertical={false}
+                    />
+                  ))}
+                  {deck.length > 1 && (
+                    <DraggableCard
+                      key="back-card"
+                      card={backCard}
+                      index={deck.length}
+                      vertical={false}
+                    />
+                  )}
+
+                  {randomCard && (
+                    <DraggableCard
+                      key="front-card"
+                      card={randomCard}
+                      index={deck.length + 1}
+                      vertical={false}
+                    />
+                  )}
+
+                  {isGameOver && (
+                    <div className="mt-15">
+                      <div className="px-5 text-red-700 text-2xl font-semibold ">
+                        Game Over!!
+                      </div>
+                      <div className="px-5 text-red-700 text-2xl font-semibold ">
+                        Start New Game
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
             </div>
           </div>
@@ -326,12 +352,37 @@ const PlaySection = () => {
 
         {!isGameStarted && (
           <div className="absolute inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-100">
-            <button
-              onClick={() => setIsGameStarted(true)}
-              className="px-6 py-3 bg-white text-green-700 font-semibold rounded-lg shadow-md hover:bg-green-100 transition-all"
-            >
-              Start Game
-            </button>
+            {!showGames ? (
+              <button
+                onClick={() => setShowGames(true)}
+                className="px-6 py-3 bg-white text-green-700 font-semibold rounded-lg shadow-md hover:bg-green-100 transition-all mr-10"
+              >
+                Start Game
+              </button>
+            ) : (
+              <>
+                <button
+                  onClick={() => setShowGames(false)}
+                  className="px-6 py-3 bg-white text-green-700 font-semibold rounded-lg shadow-md hover:bg-green-100 transition-all mr-10 cursor-pointer absolute left-5 top-5"
+                >
+                  <IoMdArrowRoundBack />
+                </button>
+                <button
+                  onClick={() => setIsGameStarted(true)}
+                  className="px-6 py-3 bg-white text-green-700 font-semibold rounded-lg shadow-md hover:bg-green-100 transition-all mr-10 cursor-pointer"
+                >
+                  CANFIELD SOLITAIRE
+                </button>
+                <Link to="/allinarena">
+                  <button
+                    onClick={() => setIsGameStarted(true)}
+                    className="px-6 py-3 bg-white text-green-700 font-semibold rounded-lg shadow-md hover:bg-green-100 transition-all cursor-pointer"
+                  >
+                    All-In Arena
+                  </button>
+                </Link>
+              </>
+            )}
           </div>
         )}
 
@@ -346,7 +397,8 @@ const PlaySection = () => {
           </div>
         )}
       </div>
-      {showRuleBook && <RuleBookComponent closeModal={handleClose} />}
+      {showRuleBook && <RuleBookComponent closeModal={handleCloseRuleBook} />}
+      {chooseGame && <ChooseGameModal closeModal={handleCloseChooseModal} />}
     </div>
   );
 };
