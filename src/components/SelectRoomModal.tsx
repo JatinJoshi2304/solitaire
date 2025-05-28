@@ -1,15 +1,21 @@
 import { useEffect, useState } from "react";
-import type Room from "../types/Room";
 import { FaLock, FaLockOpen } from "react-icons/fa";
 import gameBoard from "../../public/table.png";
 import axios from "axios";
+import type Player from "../types/Player";
+import type Room from "../types/Room";
 
 interface SelectRoomModalProps {
   closeModal: (value: boolean) => void;
   updateRoom: (value: Room) => void;
+  updatePlayer: (value: Player) => void;
 }
 
-const SelectRoomModal = ({ closeModal, updateRoom }: SelectRoomModalProps) => {
+const SelectRoomModal = ({
+  closeModal,
+  updateRoom,
+  updatePlayer,
+}: SelectRoomModalProps) => {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [serverName, setServerName] = useState("");
   const [password, setPassword] = useState("");
@@ -18,6 +24,7 @@ const SelectRoomModal = ({ closeModal, updateRoom }: SelectRoomModalProps) => {
   const [joinRoomSelected, setJoinRoomSelected] = useState(true);
   const [joinRoom, setJoinRoom] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
+  const [player, setPlayer] = useState<Player | null>(null);
 
   useEffect(() => {
     fetchRooms();
@@ -26,7 +33,8 @@ const SelectRoomModal = ({ closeModal, updateRoom }: SelectRoomModalProps) => {
   const fetchRooms = async () => {
     try {
       const response = await axios.get("http://localhost:5000/api/rooms");
-      setRooms(response.data.room);
+      const data = response.data as { room: Room[] };
+      setRooms(data.room);
     } catch (error) {
       console.error("Error fetching rooms:", error);
     }
@@ -41,6 +49,18 @@ const SelectRoomModal = ({ closeModal, updateRoom }: SelectRoomModalProps) => {
     setPassword(""); // clear password on room select
   };
 
+  const handleCreateGuest = async () => {
+    try {
+      const response = await axios.post("http://localhost:5000/api/player", {
+        name: userName,
+      });
+      const data = response.data as { player: Player };
+      setPlayer(data.player);
+    } catch (error) {
+      console.error("Error creating guest player:", error);
+    }
+  };
+
   const handleJoinRoom = async () => {
     if (!selectedRoom || !userName.trim()) {
       alert("Please select a room and enter a username.");
@@ -49,15 +69,19 @@ const SelectRoomModal = ({ closeModal, updateRoom }: SelectRoomModalProps) => {
 
     try {
       const roomId = selectedRoom._id;
-      debugger;
-      const res = await axios.post(
+      const response = await axios.post(
         `http://localhost:5000/api/rooms/${roomId}/join`,
         {
           name: userName,
           code: password,
         }
       );
-      updateRoom(res.data);
+      const data = response.data as { room: Room };
+      updateRoom(data.room);
+
+      if (player) {
+        updatePlayer(player);
+      }
       closeModal(true);
     } catch (error: any) {
       alert(error.response?.data?.message || "Failed to join room");
@@ -71,24 +95,28 @@ const SelectRoomModal = ({ closeModal, updateRoom }: SelectRoomModalProps) => {
     }
 
     try {
-      const res = await axios.post("http://localhost:5000/api/rooms", {
+      const response = await axios.post("http://localhost:5000/api/rooms", {
         serverName,
         code: password,
-        name: userName,
+        ownerId: player?._id,
       });
-      const createdRoom = res.data;
-      setSelectedRoom(createdRoom);
-      updateRoom(createdRoom);
+      const createdRoom = response.data as { room: Room };
+      setSelectedRoom(createdRoom.room);
+      updateRoom(createdRoom.room);
+      if (player) {
+        updatePlayer(player);
+      }
+
       closeModal(true);
-    } catch (err: any) {
-      alert(err.response?.data?.message || "Error creating room");
+    } catch (error: any) {
+      alert(error.response?.data?.message || "Error creating room");
     }
   };
 
   return (
     <div
       tabIndex={-1}
-      className="fixed inset-0 z-50 flex items-center justify-center  bg-opacity-50"
+      className="fixed inset-0 z-100 flex items-center justify-center bg-opacity-50"
       onClick={handleClose}
     >
       <div className="absolute top-6 z-0">
@@ -140,48 +168,60 @@ const SelectRoomModal = ({ closeModal, updateRoom }: SelectRoomModalProps) => {
         {/* Create Room Form */}
         {createRoomSelected && (
           <div className="mt-5 space-y-4">
-            <div>
-              <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-1">
-                Server Name
-              </label>
-              <input
-                type="text"
-                value={serverName}
-                onChange={(e) => setServerName(e.target.value)}
-                className="w-full px-4 py-2 border rounded-lg dark:bg-gray-800 dark:text-white"
-                placeholder="Enter server name"
-              />
-            </div>
-            <div>
-              <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-1">
-                Password (optional)
-              </label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-2 border rounded-lg dark:bg-gray-800 dark:text-white"
-                placeholder="Enter password"
-              />
-            </div>
-            <div>
-              <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-1">
-                Username
-              </label>
-              <input
-                type="text"
-                value={userName}
-                onChange={(e) => setUserName(e.target.value)}
-                className="w-full px-4 py-2 border rounded-lg dark:bg-gray-800 dark:text-white"
-                placeholder="Enter Username"
-              />
-            </div>
-            <button
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-all"
-              onClick={handleCreateRoom}
-            >
-              Create Room
-            </button>
+            {!player ? (
+              <div>
+                <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-1">
+                  Username
+                </label>
+                <input
+                  type="text"
+                  value={userName}
+                  onChange={(e) => setUserName(e.target.value)}
+                  className="w-full px-4 py-2 border rounded-lg dark:bg-gray-800 dark:text-white"
+                  placeholder="Enter Username"
+                />
+                <button
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-all mt-2"
+                  onClick={handleCreateGuest}
+                >
+                  Create Guest
+                </button>
+              </div>
+            ) : (
+              <>
+                <div>
+                  <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-1">
+                    Server Name
+                  </label>
+                  <input
+                    type="text"
+                    value={serverName}
+                    onChange={(e) => setServerName(e.target.value)}
+                    className="w-full px-4 py-2 border rounded-lg dark:bg-gray-800 dark:text-white"
+                    placeholder="Enter server name"
+                  />
+                </div>
+                <div>
+                  <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-1">
+                    Password (optional)
+                  </label>
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full px-4 py-2 border rounded-lg dark:bg-gray-800 dark:text-white"
+                    placeholder="Enter password"
+                  />
+                </div>
+
+                <button
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-all"
+                  onClick={handleCreateRoom}
+                >
+                  Create Room
+                </button>
+              </>
+            )}
           </div>
         )}
 
@@ -236,38 +276,51 @@ const SelectRoomModal = ({ closeModal, updateRoom }: SelectRoomModalProps) => {
               Joining{" "}
               <span className="text-blue-600">{selectedRoom.serverName}</span>
             </p>
-            {selectedRoom.isPasswordProtected && (
+
+            {!player ? (
               <div>
                 <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-1">
-                  Password
+                  Username
                 </label>
                 <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  type="text"
+                  value={userName}
+                  onChange={(e) => setUserName(e.target.value)}
                   className="w-full px-4 py-2 border rounded-lg dark:bg-gray-800 dark:text-white"
-                  placeholder="Enter password"
+                  placeholder="Enter Username"
                 />
+                <button
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-all mt-2"
+                  onClick={handleCreateGuest}
+                >
+                  Create Guest
+                </button>
               </div>
+            ) : (
+              <>
+                {selectedRoom.isPasswordProtected && (
+                  <div>
+                    <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-1">
+                      Password
+                    </label>
+                    <input
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="w-full px-4 py-2 border rounded-lg dark:bg-gray-800 dark:text-white"
+                      placeholder="Enter password"
+                    />
+                  </div>
+                )}
+
+                <button
+                  className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition-all mt-4"
+                  onClick={handleJoinRoom}
+                >
+                  Join Room
+                </button>
+              </>
             )}
-            <div>
-              <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-1">
-                Username
-              </label>
-              <input
-                type="text"
-                value={userName}
-                onChange={(e) => setUserName(e.target.value)}
-                className="w-full px-4 py-2 border rounded-lg dark:bg-gray-800 dark:text-white"
-                placeholder="Enter username"
-              />
-            </div>
-            <button
-              className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition-all"
-              onClick={handleJoinRoom}
-            >
-              Join Room
-            </button>
           </div>
         )}
       </div>

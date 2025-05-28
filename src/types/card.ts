@@ -23,11 +23,3 @@ export interface Room {
   createdAt: Date;
   updatedAt: Date;
 }
-export interface Player {
-  id: string;
-  name: string;
-  avatar?: string;
-  score: number;
-  roomId: string;
-  isReady: boolean;
-}

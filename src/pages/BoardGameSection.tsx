@@ -1,145 +1,148 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 import gameBoard from "../../public/table.png";
 import yodaRed from "../../public/profile/yodaRed.png";
-import ChooseGameModal from "../components/ChooseGameModal";
+import axios from "axios";
 import SelectRoomModal from "../components/SelectRoomModal";
-
 import type Room from "../types/Room";
+import type Player from "../types/Player";
+
 const BoardGameSection = () => {
-  const [showGames, setShowGames] = useState(false);
-  const [chooseGame, setChooseGame] = useState(false);
-  const [SelectedRoom, setselectedRoom] = useState<Room | null>(null);
+  const [closeModal, setCloseModal] = useState(false);
+  const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
+  const [currentPlayer, setCurrentPlayer] = useState<Player | null>(null);
+  const [mainPlayer, setMainPlayer] = useState<Player | null>(null);
+  const [otherPlayers, setOtherPlayers] = useState<Player[]>([]);
+  const [time, setTime] = useState(0);
+  const [isGameStarted, setIsGameStarted] = useState(false);
   const handleCloseChooseModal = (close: boolean) => {
-    setChooseGame(close);
+    setCloseModal(close);
   };
 
-  const handleRoomSelected = (selected: Room) => {
-    setselectedRoom(selected);
-    console.log("Selecetd Room:", selected);
+  const handleRoomSelected = (room: Room) => {
+    setSelectedRoom(room);
+    console.log("Selected Room:", room);
   };
 
-  if (!SelectedRoom) {
+  const handleSetPlayer = (player: Player) => {
+    setCurrentPlayer(player);
+  };
+
+  const handleGetPlayers = async () => {
+    if (!selectedRoom?._id || !currentPlayer?._id) return;
+
+    try {
+      const response = await axios.get<{ players: Player[] }>(
+        `http://localhost:5000/api/player/${selectedRoom._id}`
+      );
+
+      const players = response.data.players;
+
+      const main = players.find((p) => p._id === currentPlayer._id) || null;
+      const others = players.filter((p) => p._id !== currentPlayer._id);
+
+      setMainPlayer(main);
+      setOtherPlayers(others);
+
+      console.log("Main Player:", main);
+      console.log("Other Players:", others);
+    } catch (error) {
+      console.error("Error fetching players:", error);
+    }
+  };
+
+  useEffect(() => {
+    handleGetPlayers();
+  }, [closeModal]);
+
+  useEffect(() => {
+    if (isGameStarted) {
+      const interval = setInterval(() => {
+        setTime((prev) => prev + 1);
+      }, 1000);
+
+      return () => clearInterval(interval);
+    }
+  }, [isGameStarted]);
+
+  if (!selectedRoom) {
     return (
       <SelectRoomModal
         closeModal={handleCloseChooseModal}
         updateRoom={handleRoomSelected}
+        updatePlayer={handleSetPlayer}
       />
     );
   }
 
   return (
-    <div className="w-full h-full flex flex-col items-center ">
-      <div className=" w-full ml-10">
-        <span className="text-black text-lg font-bold hover:text-black cursor-pointer">
-          Server :{" "}
+    <div className="w-full h-full flex flex-col items-center">
+      {/* Server Name */}
+      <div className="w-full ml-10 flex flex-col">
+        <span>
+          <span className="text-black text-lg font-bold">Server: </span>
+          <span className="text-[#ca0639] text-lg font-bold">
+            {selectedRoom.serverName}
+          </span>
         </span>
-        <span className="text-[#ca0639] text-lg font-bold hover:text-black cursor-pointer ">
-          {SelectedRoom.serverName}
-        </span>
-        <button className="">dr</button>
-      </div>
-
-      <div className="px-[10%] flex gap-2 my-2 z-10">
-        {/* <button
-          className="text-[#ca0639] text-lg font-bold hover:text-black cursor-pointer"
-          onClick={() => setChooseGame(!chooseGame)}
-        >
-          Start game
-        </button>
-        <span className="text-[#ca0639] text-lg font-bold">{" | "}</span>
-        <button className="text-[#ca0639] text-lg font-bold hover:text-black cursor-pointer ">
-          New Game
-        </button>
-        <span className="text-[#ca0639] text-lg font-bold">{" | "}</span>
-        <button className="text-[#ca0639] text-lg font-bold hover:text-black cursor-pointer">
-          Rules
-        </button>
-        <span className="text-[#ca0639] text-lg font-bold">{" | "}</span>
-        <button
-          className="text-[#ca0639] text-lg font-bold hover:text-black cursor-pointer"
-          onClick={() => setShowGames(!showGames)}
-        >
-          Games
-        </button> */}
-        {showGames && (
-          <div className="bg-white p-2 absolute z-500 top-25 ml-35 rounded shadow-md mb-2">
-            <ul className=" list-none ">
-              <li className="text-[#ca0639] text-lg font-bold hover:text-black cursor-pointer">
-                {/* <Link to={{"/canfieldsolitaire"}}> Canfield Solitaire</Link> */}
-                <Link to="/canfieldsolitaire">Canfield Solitaire</Link>
-              </li>
-              <li className="text-[#ca0639] text-lg font-bold hover:text-black cursor-pointer">
-                <Link to="/allInArena">All-In Arena</Link>
-              </li>
-            </ul>
-          </div>
+        {isGameStarted && (
+          <button
+            onClick={() => {
+              setIsGameStarted(true);
+            }}
+            className="px-6 py-3 w-40 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-800 transition-all"
+          >
+            Join Room
+          </button>
         )}
       </div>
-      <div className="flex flex-col items-around justify-between h-full w-full px-60 py-8 z-10">
-        <div className="absolute -bottom-1 z-0 right-155 flex flex-col items-center justify-center">
-          <div className="rounded-full bg-white w-26 h-26 border-4 border-[#00e731]">
-            <img
-              className="rounded-full bg-white object-cover"
-              src={yodaRed}
-              alt="yodaProfile"
-            />
-          </div>
-          <div className="border-2 border-[#00e731] h-20 w-40 bg-[#021323] rounded-md flex flex-col justify-center items-center gap-2 px-2">
-            <span className="text-white font-bold">Jatin</span>
-            {/* <span className="bg-gray-700 h-6 w-px"></span> */}
-            {/* Optional: You can add more info after the separator */}
-            <span className="text-white text-sm">3000</span>
-          </div>
+      <span className="font-mono">
+        Time:
+        {String(Math.floor(time / 3600)).padStart(2, "0")}:
+        {String(Math.floor((time % 3600) / 60)).padStart(2, "0")}:
+        {String(time % 60).padStart(2, "0")}
+      </span>
+
+      {/* Main Player */}
+      <div className="absolute -bottom-1 z-10 right-155 flex flex-col items-center justify-center">
+        <div className="rounded-full bg-white w-26 h-26 border-4 border-[#00e731]">
+          <img
+            className="rounded-full bg-white object-cover"
+            src={yodaRed}
+            alt="yodaProfile"
+          />
         </div>
-        <div className="w-full h-fit flex flex-row ">
-          {/* <div className=" flex flex-col justify-center items-center">
-            <div className="rounded-full bg-white w-26 h-26 border-4 border-[#00e731]">
-              <img
-                className="rounded-full bg-white object-cover"
-                src={yodaRed}
-                alt="yodaProfile"
-              />
-            </div>
-            <div className="border-2 border-[#00e731] h-15 w-30 bg-[#021323] rounded-md">
-              <span className="text-white font-bold">Jatin</span>
-            </div>
-          </div> */}
-          {/* <div>
-            <div className="rounded-full bg-white w-full h-full border-5 border-green-600">
-              <img
-                className="rounded-full bg-white object-cover"
-                src={YodaGreen}
-                alt="yodaProfile"
-              />
-            </div>
-          </div> */}
-        </div>
-        <div className="w-full flex flex-row justify-between">
-          {/* <div>
-            <div className="rounded-full bg-white w-full h-full border-5 border-blue-900">
-              <img
-                className="rounded-full bg-white object-cover"
-                src={yodaBlue}
-                alt="yodaProfile"
-              />
-            </div>
-          </div> */}
-          {/* <div>
-            <div className="rounded-full bg-white w-full h-full border-5 border-black-600">
-              <img
-                className="rounded-full bg-white object-cover"
-                src={yodaBlack}
-                alt="yodaProfile"
-              />
-            </div>
-          </div> */}
+        <div className="border-2 border-[#00e731] h-15 w-26 bg-[#021323] rounded-md flex flex-col justify-center items-center gap-2 px-2">
+          <span className="text-white font-bold">{mainPlayer?.name}</span>
         </div>
       </div>
+
+      {/* Other Players */}
+      <div className="flex flex-col justify-between h-full w-full px-60 py-8 z-10">
+        <div className="grid grid-cols-2 gap-x-180 gap-y-10 w-10 h-fit ">
+          {otherPlayers.map((player, index) => (
+            <div
+              key={index}
+              className="flex flex-col w-30 justify-center items-end"
+            >
+              <div className="rounded-full bg-white w-26 h-26 border-4 border-[#00e731]">
+                <img
+                  className="rounded-full bg-white object-cover"
+                  src={yodaRed}
+                  alt="yodaProfile"
+                />
+              </div>
+              <div className="border-2 border-[#00e731] h-15 w-26 bg-[#021323] rounded-md flex flex-col justify-center items-center gap-2 px-2">
+                <span className="text-white font-bold">{player.name}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Background Game Board */}
       <div className="absolute top-6 z-0">
-        <img src={gameBoard} alt="" className="h-160" />
+        <img src={gameBoard} alt="gameBoard" className="h-160" />
       </div>
-      {/* {chooseGame && <ChooseGameModal closeModal={handleCloseChooseModal} />} */}
     </div>
   );
 };
