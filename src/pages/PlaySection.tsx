@@ -369,14 +369,14 @@ const PlaySection = () => {
                 </button>
                 <button
                   onClick={() => setIsGameStarted(true)}
-                  className="px-6 py-3 bg-white text-green-700 font-semibold rounded-lg shadow-md hover:bg-green-100 transition-all mr-10 cursor-pointer"
+                  className="px-6 py-3 bg-white text-green-700 font-semibold rounded-lg shadow-md hover:bg-green-100 transition-all mr-10 cursor-pointer w-45"
                 >
-                  CANFIELD SOLITAIRE
+                  Canfield Solitaire
                 </button>
                 <Link to="/allinarena">
                   <button
                     onClick={() => setIsGameStarted(true)}
-                    className="px-6 py-3 bg-white text-green-700 font-semibold rounded-lg shadow-md hover:bg-green-100 transition-all cursor-pointer"
+                    className="px-6 py-3 bg-white text-green-700 font-semibold rounded-lg shadow-md hover:bg-green-100 transition-all cursor-pointer w-45"
                   >
                     All-In Arena
                   </button>
