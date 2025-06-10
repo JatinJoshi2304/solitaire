@@ -9,7 +9,7 @@ interface Props {
   height: number;
 }
 
-const DraggableCard = ({ card, index = 0, vertical }: Props) => {
+const DraggableCardForCatfield = ({ card, index = 0, vertical }: Props) => {
   const ref = useRef<HTMLDivElement>(null);
 
   const [{ isDragging }, drag] = useDrag({
@@ -29,7 +29,7 @@ const DraggableCard = ({ card, index = 0, vertical }: Props) => {
   return (
     <div
       ref={ref}
-      className={`w-[60px] h-[80px] relative bg-white border-1 border-gray-400 rounded-md shadow-xs flex items-center justify-center overflow-hidden mt:[${index}px]`}
+      className={`w-[130px] h-[180px] relative bg-white border-1 border-gray-400 rounded-md shadow-xs flex items-center justify-center overflow-hidden mt:[${index}px]`}
       style={{
         opacity: isDragging ? 0 : 1,
         cursor: "move",
@@ -47,4 +47,4 @@ const DraggableCard = ({ card, index = 0, vertical }: Props) => {
   );
 };
 
-export default DraggableCard;
+export default DraggableCardForCatfield;

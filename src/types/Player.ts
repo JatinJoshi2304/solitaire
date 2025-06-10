@@ -1,8 +1,10 @@
 export default interface Player {
   _id: string;
   name: string;
-  score: number;
+  points: number;
+  bet: number;
   roomId: string;
   isOwner: boolean;
   isReady: boolean;
+  cards: string[];
 }

@@ -1,0 +1,68 @@
+
+.card {
+    width: 100px;
+    height: 100px;
+    position: absolute;
+    animation-duration: 0.5s;
+  }
+  
+
+  .card-TL {
+    animation-name: moveTopLeft;
+  }
+  
+  @keyframes moveTopLeft {
+    100% {
+      left: 0px;
+      top: 50px;
+    }
+  }
+  
+
+  .card-TR {
+    animation-name: moveTopRight;
+  }
+  
+  @keyframes moveTopRight {
+    100%  { 
+      left:550px;
+      top:0px;}
+  }
+  
+
+  .card-BL {
+    animation-name: moveBottomLeft;
+  }
+  
+  @keyframes moveBottomLeft {
+    100% {
+      top: 280px;
+      left: 0px;
+    }
+  }
+  
+
+  .card-BC {
+  
+    animation-name: moveBottomCenter;
+  }
+  
+  @keyframes moveBottomCenter {
+    100% {
+      top: 330px;
+    
+    }
+  }
+  
+
+  .card-BR {
+    animation-name: moveBottomRight;
+  }
+  
+  @keyframes moveBottomRight {
+    100%  { 
+      top: 300px;
+      left: 500px;
+    }
+  }
+  

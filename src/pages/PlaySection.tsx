@@ -6,7 +6,7 @@ import {
   RiPokerDiamondsFill,
   RiPokerClubsFill,
 } from "react-icons/ri";
-import DraggableCard from "../components/DraggableCard";
+import DraggableCardForCatfield from "../components/DraggableCardForCatfield";
 import SuitDropZone from "../components/SuitDropZone";
 import type { Card } from "../types/card";
 import RuleBookComponent from "../components/RuleBookComponent";
@@ -196,13 +196,6 @@ const PlaySection = () => {
   return (
     <div className="w-full h-full flex flex-col items-center justify-center">
       <div className="px-[10%] flex gap-2 my-2">
-        {/* <button
-          className="text-[#ca0639] text-lg font-bold hover:text-black cursor-pointer"
-          onClick={() => setChooseGame(!chooseGame)}
-        >
-          Start game
-        </button> */}
-        {/* <span className="text-[#ca0639] text-lg font-bold">{" | "}</span> */}
         <button
           className="text-[#ca0639] text-lg font-bold hover:text-black cursor-pointer "
           onClick={() => {
@@ -309,28 +302,34 @@ const PlaySection = () => {
               ) : (
                 <>
                   {deck.map((card, i) => (
-                    <DraggableCard
+                    <DraggableCardForCatfield
                       key={i}
                       card={card}
                       index={i}
                       vertical={false}
+                      height={180}
+                      width={130}
                     />
                   ))}
                   {deck.length > 1 && (
-                    <DraggableCard
+                    <DraggableCardForCatfield
                       key="back-card"
                       card={backCard}
                       index={deck.length}
                       vertical={false}
+                      height={180}
+                      width={130}
                     />
                   )}
 
                   {randomCard && (
-                    <DraggableCard
+                    <DraggableCardForCatfield
                       key="front-card"
                       card={randomCard}
                       index={deck.length + 1}
                       vertical={false}
+                      height={180}
+                      width={130}
                     />
                   )}
 

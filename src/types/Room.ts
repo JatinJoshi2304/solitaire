@@ -3,4 +3,7 @@ export default interface Room {
   serverName: string;
   code?: string;
   isPasswordProtected: boolean;
+  players: number[];
+  ownerId?: string;
+  isGameStarted: boolean;
 }

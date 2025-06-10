@@ -53,6 +53,7 @@ const SelectRoomModal = ({
     try {
       const response = await axios.post("http://localhost:5000/api/player", {
         name: userName,
+        points: 5000,
       });
       const data = response.data as { player: Player };
       setPlayer(data.player);
@@ -123,7 +124,7 @@ const SelectRoomModal = ({
         <img src={gameBoard} alt="" className="h-160" />
       </div>
       <div
-        className="bg-white dark:bg-gray-900 w-100 max-w-3xl mx-4 h-4/5 rounded-lg overflow-y-scroll shadow-lg p-6 relative top-5"
+        className="bg-white dark:bg-gray-900 w-120 max-w-3xl mx-4 h-4/5 rounded-lg overflow-y-scroll shadow-lg p-6 relative top-5"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="text-center mb-6">
@@ -233,6 +234,7 @@ const SelectRoomModal = ({
                 <tr>
                   <th className="px-6 py-3">Server Name</th>
                   <th className="px-6 py-3">Status</th>
+                  <th className="px-6 py-3">Players</th>
                   <th className="px-6 py-3">Action</th>
                 </tr>
               </thead>
@@ -242,8 +244,8 @@ const SelectRoomModal = ({
                     key={room._id}
                     className="bg-white dark:bg-gray-800 border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
                   >
-                    <td className="px-6 py-4">{room.serverName}</td>
-                    <td className="px-6 py-4 flex items-center gap-2">
+                    <td className="px-6 py-4 ">{room.serverName}</td>
+                    <td className="px-6 py-4 flex items-center justify-center gap-2">
                       {room.isPasswordProtected ? (
                         <>
                           <FaLock className="text-red-500" /> Protected
@@ -254,13 +256,20 @@ const SelectRoomModal = ({
                         </>
                       )}
                     </td>
+
+                    <td className="px-6 py-4">{room.players.length}/5</td>
+
                     <td className="px-6 py-4">
-                      <button
-                        className="text-blue-600 hover:underline dark:text-blue-400"
-                        onClick={() => handleSelectRoom(room)}
-                      >
-                        Join
-                      </button>
+                      {room.players.length < 5 ? (
+                        <button
+                          className="text-blue-600 hover:underline dark:text-blue-400"
+                          onClick={() => handleSelectRoom(room)}
+                        >
+                          Join
+                        </button>
+                      ) : (
+                        "Full"
+                      )}
                     </td>
                   </tr>
                 ))}
