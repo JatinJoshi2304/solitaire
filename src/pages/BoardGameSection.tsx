@@ -33,6 +33,7 @@ const BoardGameSection = () => {
   const [bet, setBet] = useState(100);
   const [totalBet, setTotalBet] = useState(0);
   const [betInputValue, setBetInputValue] = useState(bet);
+  // const [currentRound, setCurrentRound] = useState(0);
   const radius = 30;
   const circumference = 2 * Math.PI * radius;
 
@@ -72,12 +73,16 @@ const BoardGameSection = () => {
           if (prev === 1 && !playerUpdated) {
             // Update the player index exactly once when timeLeft hits 1
             setPlayerIndex((prevIndex) => (prevIndex + 1) % allPlayers.length);
-            setRevealCards(() => {
-              if (allPlayers[playerIndex + 1]) {
-                return allPlayers[playerIndex + 1]._id === mainPlayer?._id;
-              }
-              return false;
-            });
+            // setRevealCards(() => {
+            //   if (allPlayers[playerIndex + 1]) {
+            //     return allPlayers[playerIndex + 1]._id === mainPlayer?._id;
+            //   }
+            //   return false;
+            // });
+            debugger;
+            // if (allPlayers[playerIndex]._id === allPlayers[0]?._id) {
+            //   handleUpdateRound();
+            // }
             playerUpdated = true; // Flag to prevent the index from being updated again
           }
 
@@ -95,6 +100,27 @@ const BoardGameSection = () => {
       };
     }, 5000);
   }, [isGameStarted, allPlayers.length]);
+
+  // const handleUpdateRound = async () => {
+  //   try {
+  //     if (!selectedRoom?._id || !currentPlayer?._id) return;
+  //     const updatedRoom = {
+  //       round: currentRound + 1,
+  //     };
+  //     // const response = await axios.put<{ room: Room }>(
+  //     //   ` https://solitaire-backend.onrender.com/api/rooms/${selectedRoom._id}`,
+  //     //   updatedRoom
+  //     // );
+  //     const response = await axios.put<{ room: Room }>(
+  //       ` http://localhost:5000/api/rooms/${selectedRoom._id}`,
+  //       updatedRoom
+  //     );
+  //     setCurrentRound((prev) => prev + 1);
+  //     console.log("Updated Room:", response.data.room);
+  //   } catch (error) {
+  //     console.error("Error fetching players:", error);
+  //   }
+  // };
 
   useEffect(() => {
     if (isGameStarted && timeLeft <= 0) {
@@ -164,8 +190,12 @@ const BoardGameSection = () => {
   };
 
   const handleFold = () => {
-    setPlayerIndex((prevIndex) => (prevIndex + 1) % allPlayers.length);
-    setRevealCards(false);
+    if (revealCards) {
+      setPlayerIndex((prevIndex) => (prevIndex + 1) % allPlayers.length);
+      setRevealCards(false);
+    } else {
+      setRevealCards(true);
+    }
     setTimeLeft(20);
     setTime(20);
   };
@@ -189,7 +219,7 @@ const BoardGameSection = () => {
 
     try {
       const response = await axios.get<{ players: Player[] }>(
-        `http://localhost:5000/api/player/${selectedRoom._id}`
+        `https://solitaire-backend.onrender.com/api/player/${selectedRoom._id}`
       );
 
       const players = response.data.players;
@@ -197,8 +227,41 @@ const BoardGameSection = () => {
       const main = players.find((p) => p._id === currentPlayer._id) || null;
       const others = players.filter((p) => p._id !== currentPlayer._id);
       console.log("others :: ", others);
+
+      if (main?._id === players[1]?._id) {
+        // Swap players at index 1 and 3 in the `others` array
+        const temp = others[1];
+        others[1] = others[3];
+        others[3] = temp;
+
+        // Update the state with the modified `others` array
+        setOtherPlayers([...others]);
+      } else if (main?._id === players[2]?._id) {
+        // Swap players at index 0 and 1
+        const temp1 = others[0];
+        others[0] = others[1];
+        others[1] = temp1;
+
+        // Swap players at index 2 and 3
+        const temp2 = others[2];
+        others[2] = others[3];
+        others[3] = temp2;
+        console.log("otherdvcsdcvds :: ", others);
+        // Update the state with the modified `others` array
+        setOtherPlayers([...others]);
+      } else if (main?._id === players[3]?._id) {
+        // Swap players at index 0 and 2
+        const temp = others[0];
+        others[0] = others[2];
+        others[2] = temp;
+
+        // Update the state with the modified `others` array
+        setOtherPlayers([...others]);
+      } else {
+        setOtherPlayers(others);
+      }
+
       setMainPlayer(main);
-      setOtherPlayers(others);
       const cards: any[] = [];
       const tempDeck = [...deck];
 
@@ -237,7 +300,6 @@ const BoardGameSection = () => {
   // }, [playerIndex]);
 
   useEffect(() => {
-    debugger;
     if (revealCards) {
       console.log("Reveal Cards :: ", revealCards);
       const interval = setInterval(() => {
@@ -263,7 +325,7 @@ const BoardGameSection = () => {
     try {
       if (!selectedRoom?._id || !currentPlayer?._id) return;
       const response = await axios.get<{ room: Room }>(
-        `http://localhost:5000/api/rooms/${selectedRoom._id}`
+        ` https://solitaire-backend.onrender.com/api/rooms/${selectedRoom._id}`
       );
       console.log(
         "isGame Started ::::::::::::",
@@ -290,7 +352,7 @@ const BoardGameSection = () => {
         isGameStarted: true,
       };
       const response = await axios.put<{ room: Room }>(
-        `http://localhost:5000/api/rooms/${selectedRoom._id}`,
+        ` https://solitaire-backend.onrender.com/api/rooms/${selectedRoom._id}`,
         updatedRoom
       );
       console.log("Updated Room:", response.data.room);
@@ -355,13 +417,20 @@ const BoardGameSection = () => {
           </span>
         </span>
 
-        {!isGameStarted && otherPlayers.length == 4 && mainPlayer?.isOwner && (
+        {!isGameStarted && otherPlayers.length == 4 && mainPlayer?.isOwner ? (
           <button
             onClick={handleStartGame}
             className=" absolute top-15 px-6 py-3 w-30 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-800 transition-all"
           >
             start
           </button>
+        ) : (
+          <span>
+            {/* <span className="text-black text-lg font-bold">Round: </span>
+            <span className="text-[#ca0639] text-lg font-bold">
+              {currentRound}
+            </span> */}
+          </span>
         )}
       </div>
       {allPlayers.length > 0 && (
@@ -462,6 +531,7 @@ const BoardGameSection = () => {
             </div>
           </div>
           <div className="flex flex-col text-center">
+            <span className="text-white font-bold">{mainPlayer?.points}</span>
             <span className="text-white font-bold">{mainPlayer?.name}</span>
           </div>
         </div>
@@ -513,7 +583,7 @@ const BoardGameSection = () => {
                   className="bg-[#ca0639] hover:bg-[#a1052e]  text-sm text-white py-1 rounded-lg transition-all w-full"
                   onClick={handleFold}
                 >
-                  Fold
+                  {revealCards ? "Fold" : "Reveal"}
                 </button>
                 {/* <button className="bg-[#ca0639] hover:bg-[#a1052e] text-white py-1 rounded-xl transition-all w-full">
                   Raise

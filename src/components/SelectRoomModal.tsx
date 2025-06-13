@@ -32,7 +32,9 @@ const SelectRoomModal = ({
 
   const fetchRooms = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/rooms");
+      const response = await axios.get(
+        " https://solitaire-backend.onrender.com/api/rooms"
+      );
       const data = response.data as { room: Room[] };
       setRooms(data.room);
     } catch (error) {
@@ -51,10 +53,13 @@ const SelectRoomModal = ({
 
   const handleCreateGuest = async () => {
     try {
-      const response = await axios.post("http://localhost:5000/api/player", {
-        name: userName,
-        points: 5000,
-      });
+      const response = await axios.post(
+        " https://solitaire-backend.onrender.com/api/player",
+        {
+          name: userName,
+          points: 5000,
+        }
+      );
       const data = response.data as { player: Player };
       setPlayer(data.player);
     } catch (error) {
@@ -71,7 +76,7 @@ const SelectRoomModal = ({
     try {
       const roomId = selectedRoom._id;
       const response = await axios.post(
-        `http://localhost:5000/api/rooms/${roomId}/join`,
+        ` https://solitaire-backend.onrender.com/api/rooms/${roomId}/join`,
         {
           name: userName,
           code: password,
@@ -96,11 +101,14 @@ const SelectRoomModal = ({
     }
 
     try {
-      const response = await axios.post("http://localhost:5000/api/rooms", {
-        serverName,
-        code: password,
-        ownerId: player?._id,
-      });
+      const response = await axios.post(
+        " https://solitaire-backend.onrender.com/api/rooms",
+        {
+          serverName,
+          code: password,
+          ownerId: player?._id,
+        }
+      );
       const createdRoom = response.data as { room: Room };
       setSelectedRoom(createdRoom.room);
       updateRoom(createdRoom.room);
